@@ -2,6 +2,7 @@ import express from "express";
 import http from "http";
 import { Server } from "socket.io";
 import path from "path";
+import { fileURLToPath } from 'url';
 
 const app = express();
 
@@ -77,13 +78,16 @@ io.on("connection", (socket) => {
 
 const port = process.env.PORT || 5000;
 
-const __dirname = path.resolve();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-app.use(express.static(path.join(__dirname, "frontend", "dist")));
-
-app.get((req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
+const staticPath = path.join(__dirname, "../frontend/dist");
+app.use(express.static(staticPath));
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(staticPath, "index.html"));
 });
+
+
 
 server.listen(port, () => {
   console.log("server is working on port 5000");
